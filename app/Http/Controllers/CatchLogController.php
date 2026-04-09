@@ -2,8 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\CatchLog;
-use App\Models\FisherProfile;
+use App\Models\CatchLog; // This is the correct way to link the model
 use Illuminate\Http\Request;
 
 class CatchLogController extends Controller
@@ -11,22 +10,36 @@ class CatchLogController extends Controller
     public function index()
     {
         $logs = CatchLog::with('fisherProfile.user')->latest()->get();
-        $fishermen = FisherProfile::with('user')->get(); // For the dropdown in the form
-        return view('catch-log.index', compact('logs', 'fishermen'));
+        return view('catch-log.index', compact('logs'));
     }
 
-    public function store(Request $request)
-    {
-        $request->validate([
-            'fisher_profile_id' => 'required|exists:fisher_profiles,id',
-            'species' => 'required|string',
-            'weight_kg' => 'required|numeric',
-            'quality_grade' => 'required',
-            'date_caught' => 'required|date',
+    // Finalize the weight at the dock
+    public function finalize(Request $request, $id) {
+        $log = CatchLog::findOrFail($id);
+        
+        $log->update([
+            'weight_kg' => $request->actual_weight,
+            'status' => 'finalized'
         ]);
 
-        CatchLog::create($request->all() + ['status' => 'pending']);
+        // This creates the payout record
+        \App\Models\Sale::create([
+            'catch_log_id' => $log->id,
+            'buyer_name' => 'Market',
+            'price_per_kg' => 150, 
+            'total_amount' => $request->actual_weight * 150,
+            'sale_date' => now(),
+            'payout_status' => 'paid'
+        ]);
+    }
+    public function acknowledgeSms($id) {
+        $log = CatchLog::findOrFail($id);
+        
+        // This moves it from the Top Table to the Bottom Table
+        $log->update(['status' => 'acknowledged']);
 
-        return redirect()->route('catch-log.index')->with('success', 'Catch logged successfully!');
+        // (Optional) Send the SMS back to the fisherman here...
+        
+        return back()->with('success', 'Fisherman acknowledged!');
     }
 }

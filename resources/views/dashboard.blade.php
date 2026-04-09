@@ -1,63 +1,94 @@
 @extends('layouts.app')
 
 @section('content')
-    <!-- TOP STATS -->
-    <div class="grid grid-cols-3 gap-6 mb-8">
-        <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-100 text-center">
-            <h3 class="text-gray-500 font-semibold mb-2">Total Catch</h3>
-            <p class="text-4xl font-bold text-slate-800">{{ number_format($totalCatch) }} <span class="text-2xl">kg</span></p>
-        </div>
-        <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-100 text-center">
-            <h3 class="text-gray-500 font-semibold mb-2">Available Ice</h3>
-            <p class="text-4xl font-bold text-slate-800">3,200 <span class="text-2xl">kg</span></p>
-        </div>
-        <div class="bg-white p-8 rounded-xl shadow-sm border border-gray-100 text-center">
-            <h3 class="text-gray-500 font-semibold mb-2">Market Price</h3>
-            <p class="text-4xl font-bold text-slate-800">$ {{ number_format($marketPrice, 2) }} <span class="text-2xl">/ kg</span></p>
-        </div>
-    </div>
+<div class="p-8 space-y-10">
 
-    <!-- PROGRESS BAR -->
-    <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-8">
-        <h3 class="font-bold text-gray-700 mb-4">Consolidation Logistics Target</h3>
-        <div class="w-full bg-gray-200 rounded-full h-8 relative overflow-hidden">
-            <div class="bg-orange-500 h-full flex items-center justify-center text-white font-bold text-sm" style="width: 84%">
-                84%
+    <!-- STATS CARDS -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-xl shadow-sm border flex justify-between items-center">
+            <div>
+                <p class="text-gray-500 font-bold">Today's Total Catch <span class="text-xs font-normal">(kg)</span></p>
+                <h3 class="text-4xl font-black text-slate-800">{{ number_format($totalCatchToday) }}kg</h3>
+            </div>
+            <i class="fa-solid fa-fish text-4xl text-blue-300"></i>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border flex justify-between items-center">
+            <div>
+                <p class="text-gray-500 font-bold">Active Fishers Today</p>
+                <h3 class="text-4xl font-black text-slate-800">{{ $activeFishers }} <span class="text-xl text-gray-300">/ {{ $totalFishers }}</span></h3>
+            </div>
+            <i class="fa-solid fa-user-tie text-4xl text-blue-300"></i>
+        </div>
+
+        <div class="bg-white p-6 rounded-xl shadow-sm border flex justify-between items-center">
+            <div>
+                <p class="text-gray-500 font-bold">Total Payouts Disbursed <span class="text-xs font-normal">(₱)</span></p>
+                <h3 class="text-4xl font-black text-slate-800">₱{{ number_format($totalPayouts) }}</h3>
+            </div>
+            <div class="bg-blue-100 p-3 rounded-full">
+                <i class="fa-solid fa-sack-dollar text-2xl text-blue-600"></i>
             </div>
         </div>
-        <p class="text-center mt-2 text-gray-500 text-sm font-medium">21,000 kg / 25,000 kg</p>
     </div>
 
-    <!-- TABLE -->
-    <div class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-        <div class="p-6 border-b border-gray-50">
-            <h3 class="font-bold text-gray-700">Payout Ledger</h3>
-        </div>
+    <!-- INCOMING SMS LOGS -->
+    <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <div class="p-4 border-b bg-gray-50"><h3 class="font-bold text-slate-700">Incoming SMS Logs</h3></div>
         <table class="w-full text-left">
-            <thead class="bg-gray-50 text-gray-500 text-sm uppercase">
+            <thead class="text-xs text-gray-400 uppercase font-bold border-b">
                 <tr>
-                    <th class="px-6 py-4">Fisherman</th>
-                    <th class="px-6 py-4">Catch (kg)</th>
-                    <th class="px-6 py-4">Rate $/kg</th>
-                    <th class="px-6 py-4">Total Payout</th>
-                    <th class="px-6 py-4">Action</th>
+                    <th class="px-6 py-3">Fisherman Name</th>
+                    <th class="px-6 py-3">Declared Weight</th>
+                    <th class="px-6 py-3">Action</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
-                @foreach($payouts as $payout)
-                <tr class="hover:bg-gray-50 transition">
-                    <td class="px-6 py-4 font-medium">{{ $payout->catchLog->fisherProfile->user->name }}</td>
-                    <td class="px-6 py-4">{{ $payout->catchLog->weight_kg }}</td>
-                    <td class="px-6 py-4">${{ number_format($payout->price_per_kg, 2) }}</td>
-                    <td class="px-6 py-4 font-bold">${{ number_format($payout->total_amount, 2) }}</td>
+            <tbody class="divide-y">
+                @foreach($pendingSms as $log)
+                <tr>
+                    <td class="px-6 py-4 font-medium">{{ $log->fisherProfile->user->name }}</td>
+                    <td class="px-6 py-4">{{ $log->declared_weight }} kg</td>
                     <td class="px-6 py-4">
-                        <button class="bg-[#4CAF50] text-white px-6 py-2 rounded-lg font-bold shadow-md hover:bg-green-600 transition">
-                            Send SMS
-                        </button>
+                        <form action="{{ route('catch-log.acknowledge', $log->id) }}" method="POST">
+                            @csrf
+                            <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded text-sm font-bold">Acknowledge via SMS</button>
+                        </form>
                     </td>
                 </tr>
                 @endforeach
             </tbody>
         </table>
     </div>
+
+    <!-- DOCK WEIGH-IN & PAYOUT -->
+    <div class="bg-white rounded-xl shadow-sm border overflow-hidden">
+        <div class="p-4 border-b bg-gray-50"><h3 class="font-bold text-slate-700">Dock Weigh-In & Payout</h3></div>
+        <table class="w-full text-left">
+            <thead class="text-xs text-gray-400 uppercase font-bold border-b">
+                <tr>
+                    <th class="px-6 py-3">Fisherman Name</th>
+                    <th class="px-6 py-3">Expected Weight</th>
+                    <th class="px-6 py-3">Actual Scale Weight</th>
+                    <th class="px-6 py-3">Action</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y">
+                @foreach($weighInList as $log)
+                <tr>
+                    <td class="px-6 py-4 font-medium">{{ $log->fisherProfile->user->name }}</td>
+                    <td class="px-6 py-4 font-bold text-gray-400">{{ $log->declared_weight }} kg</td>
+                    <td class="px-6 py-4">
+                        <form action="{{ route('catch-log.finalize', $log->id) }}" method="POST" class="flex items-center space-x-2">
+                            @csrf
+                            <input type="number" name="actual_weight" class="border rounded p-2 w-32" placeholder="0.00">
+                            <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded text-sm font-bold">Finalize & Pay Cash</button>
+                        </form>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+
+</div>
 @endsection

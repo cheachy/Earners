@@ -16,14 +16,19 @@
                 <h1 class="text-2xl font-bold tracking-tight">Earners</h1>
             </div>
 
+            <!-- SIDEBAR NAVIGATION -->
             <nav class="flex-1 px-4 space-y-2 mt-4">
-                <!-- UPDATED LINKS -->
+                <!-- Dashboard -->
                 <a href="{{ route('dashboard') }}" class="flex items-center space-x-3 p-3 rounded-lg {{ request()->routeIs('dashboard') ? 'bg-white/10' : 'hover:bg-white/10' }}">
                     <i class="fa-solid fa-house"></i> <span>Dashboard</span>
                 </a>
+
+                <!-- Catch Log -->
                 <a href="{{ route('catch-log.index') }}" class="flex items-center space-x-3 p-3 rounded-lg {{ request()->routeIs('catch-log.*') ? 'bg-white/10' : 'hover:bg-white/10' }}">
                     <i class="fa-solid fa-fish"></i> <span>Catch Log</span>
                 </a>
+
+                <!-- Payouts -->
                 <a href="{{ route('payouts.index') }}" class="flex items-center space-x-3 p-3 rounded-lg {{ request()->routeIs('payouts.*') ? 'bg-white/10' : 'hover:bg-white/10' }}">
                     <i class="fa-solid fa-dollar-sign"></i> <span>Payouts</span>
                 </a>
@@ -33,20 +38,21 @@
         <div class="flex-1 flex flex-col overflow-hidden">
             <!-- HEADER -->
             <header class="bg-white p-4 flex justify-end items-center space-x-6 shadow-sm px-8">
-                <div class="flex items-center space-x-4 border-r pr-6">
-                    <i class="fa-regular fa-bell text-xl text-gray-400 cursor-pointer hover:text-gray-600"></i>
-                </div>
                 <div class="flex items-center space-x-3">
-                    <div class="text-right">
-                        <p class="text-sm font-bold text-gray-800">{{ Auth::user()->name }}</p>
-                        <form action="{{ route('logout') }}" method="POST">
-                            @csrf
-                            <button type="submit" class="text-xs text-red-500 font-bold hover:underline">Sign Out</button>
-                        </form>
-                    </div>
-                    <div class="w-10 h-10 bg-[#0047AB] text-white rounded-full flex items-center justify-center shadow-inner">
-                        <i class="fa-solid fa-user"></i>
-                    </div>
+                    @auth
+                        <div class="text-right">
+                            <p class="text-sm font-bold text-gray-800">{{ Auth::user()->name }}</p>
+                            <form action="{{ route('logout') }}" method="POST">
+                                @csrf
+                                <button type="submit" class="text-xs text-red-500 font-bold hover:underline">Sign Out</button>
+                            </form>
+                        </div>
+                        <div class="w-10 h-10 bg-[#0047AB] text-white rounded-full flex items-center justify-center shadow-inner">
+                            <i class="fa-solid fa-user"></i>
+                        </div>
+                    @else
+                        <a href="{{ route('login') }}" class="text-sm font-bold text-[#0047AB] hover:underline">Sign In</a>
+                    @endauth
                 </div>
             </header>
 

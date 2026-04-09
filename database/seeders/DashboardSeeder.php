@@ -12,39 +12,43 @@ class DashboardSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create a User and Profile
-        $user = \App\Models\User::create([
+        // 1. Create a Clerk (Admin) - To manage the system
+        $admin = \App\Models\User::create([
+            'name' => 'Admin Clerk',
+            'email' => 'admin@earners.com',
+            'password' => bcrypt('password'),
+            'role' => 'admin'
+        ]);
+        // Create a profile for the admin so they can log in via contact number too
+        \App\Models\FisherProfile::create([
+            'user_id' => $admin->id,
+            'contact_number' => '000',
+            'location_zone' => 'Office',
+            'preferred_payment' => 'N/A'
+        ]);
+
+        // 2. Create a Fisherman (John Peterson)
+        $john = \App\Models\User::create([
             'name' => 'John Peterson',
-            'email' => 'john@example.com',
+            'email' => '09171234567@earners.com', // Match your new logic
             'password' => bcrypt('password'),
             'role' => 'fisherman'
         ]);
 
-        $profile = \App\Models\FisherProfile::create([
-            'user_id' => $user->id,
-            'contact_number' => '123456789',
-            'location_zone' => 'North Bay',
-            'preferred_payment' => 'G-Cash'
+        $johnProfile = \App\Models\FisherProfile::create([
+            'user_id' => $john->id,
+            'contact_number' => '09171234567',
+            'location_zone' => 'North Dock',
+            'preferred_payment' => 'Cash'
         ]);
 
-        // Create a Catch Log
-        $catch = \App\Models\CatchLog::create([
-            'fisher_profile_id' => $profile->id,
+        // 3. Create a "Pending" SMS Catch for John (to show in your new dashboard)
+        \App\Models\CatchLog::create([
+            'fisher_profile_id' => $johnProfile->id,
             'species' => 'Tuna',
-            'weight_kg' => 520,
-            'quality_grade' => 'A',
-            'date_caught' => now(),
-            'status' => 'sold'
-        ]);
-
-        // Create a Sale
-        \App\Models\Sale::create([
-            'catch_log_id' => $catch->id,
-            'buyer_name' => 'Local Market',
-            'price_per_kg' => 4.50,
-            'total_amount' => 2340,
-            'sale_date' => now(),
-            'payout_status' => 'pending'
+            'declared_weight' => 45.5,
+            'status' => 'pending',
+            'date_caught' => now()
         ]);
     }
 }

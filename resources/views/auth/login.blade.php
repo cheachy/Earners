@@ -27,13 +27,8 @@
                 @csrf
                 
                 <div>
-                    <label class="block text-sm font-semibold text-gray-600 mb-1">Email Address</label>
-                    <input type="email" name="email" value="{{ old('email') }}" required
-                        class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-[#0047AB] focus:border-transparent outline-none transition"
-                        placeholder="name@company.com">
-                    @error('email')
-                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
-                    @enderror
+                    <label class="block text-xs font-bold uppercase text-gray-400 mb-2">Contact Number</label>
+                    <input type="text" name="contact_number" placeholder="09123456789" required class="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-[#0047AB] focus:border-transparent outline-none transition">
                 </div>
 
                 <div>
@@ -60,7 +55,7 @@
             <div class="mt-8 pt-6 border-t border-gray-100 text-center">
                 <p class="text-sm text-gray-500">
                     Don't have an account? 
-                    <a href="#" class="text-[#0047AB] font-bold hover:underline">Register here</a>
+                    <a href="{{ route('register') }}" class="text-[#0047AB] font-bold hover:underline">Register here</a>
                 </p>
             </div>
         </div>
