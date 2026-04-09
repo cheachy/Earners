@@ -27,9 +27,6 @@
                 <a href="{{ route('payouts.index') }}" class="flex items-center space-x-3 p-3 rounded-lg {{ request()->routeIs('payouts.*') ? 'bg-white/10' : 'hover:bg-white/10' }}">
                     <i class="fa-solid fa-dollar-sign"></i> <span>Payouts</span>
                 </a>
-                <a href="{{ route('inventory.index') }}" class="flex items-center space-x-3 p-3 rounded-lg {{ request()->routeIs('inventory.*') ? 'bg-white/10' : 'hover:bg-white/10' }}">
-                    <i class="fa-solid fa-box"></i> <span>Inventory</span>
-                </a>
             </nav>
         </div>
 

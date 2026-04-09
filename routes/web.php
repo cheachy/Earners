@@ -6,6 +6,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\CatchLogController;
 use App\Http\Controllers\PayoutController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\SmsWebhookController;
 
 // Change the default route to login
 Route::get('/', function () {
@@ -23,3 +24,5 @@ Route::middleware('auth')->group(function () {
     Route::get('/payouts', [PayoutController::class, 'index'])->name('payouts.index');
     Route::get('/inventory', [InventoryController::class, 'index'])->name('inventory.index');
 });
+
+Route::post('/api/sms/incoming', [SmsWebhookController::class, 'handle']);
