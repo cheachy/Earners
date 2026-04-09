@@ -35,11 +35,9 @@ class CatchLogController extends Controller
     public function acknowledgeSms($id) {
         $log = CatchLog::findOrFail($id);
         
-        // This moves it from the Top Table to the Bottom Table
+        // Change status to move it to the next table
         $log->update(['status' => 'acknowledged']);
 
-        // (Optional) Send the SMS back to the fisherman here...
-        
-        return back()->with('success', 'Fisherman acknowledged!');
+        return back()->with('success', 'Moved to Weigh-In section.');
     }
 }

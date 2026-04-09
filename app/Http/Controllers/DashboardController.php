@@ -36,8 +36,8 @@ class DashboardController extends Controller
         // 3. DOCK WEIGH-IN & PAYOUT (Bottom Table)
         // Show reports that are ready for the official scale
         $weighInList = CatchLog::where('status', 'acknowledged')
-        ->with('fisherProfile.user')
-        ->get();
+                ->with('fisherProfile.user')
+                ->get();
 
         // 4. Send to the view
         return view('dashboard', compact(
